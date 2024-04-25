@@ -3,13 +3,7 @@ module RFAMakieExt
 using RationalFunctionApproximation, Makie
 RFA = RationalFunctionApproximation
 
-"""
-    convergenceplot(r)
 
-Plot the convergence history of a `Barycentric` or `Approximation` rational function.
-
-Markers show the maximum error on (the boundary of) the domain as a function of the numerator/denominator degree. A red marker indicates that the approximation has disallowed poles in its domain. A gold halo highlights the best approximation.
-"""
 RFA.convergenceplot(r::RFA.Approximation) = RFA.convergenceplot(r.fun)
 function RFA.convergenceplot(r::Barycentric)
     ismissing(r.stats) && error("No convergence data")
@@ -26,11 +20,7 @@ function RFA.convergenceplot(r::Barycentric)
     return fig
 end
 
-"""
-    errorplot(r; use_abs=false)
 
-Plot the pointwise error of an `Approximation` on (the boundary of) its domain. If the error is not real, then the real and imaginary parts are plotted separately, unless `use_abs=true`.
-"""
 function RFA.errorplot(r::RFA.Approximation; use_abs=false)
     fig = Figure( )
     ax = Axis(

@@ -117,8 +117,19 @@ function refine(t, N)
     return vec( x[1:end-1] .+ (d' .* Δx) )
 end
 
+"""
+    BatchFunction(f, p)
+
+Constructor for an out-of-place batched function of the form `ys = f(xs, p)`
+
+"""
+struct BatchFunction{F,P}
+    f::F
+    p::P
+end
+
 function aaa(
-    f::Function;
+    f;
     max_degree=150, float_type=Float64, tol=1000*eps(float_type),
     refinement=3, lookahead=10, stats=false
     )
@@ -130,13 +141,13 @@ function aaa(
     nodes, vals, pol, weights = Vector{T}[], Vector{CT}[], Vector{CT}[], Vector{CT}[]
 
     S = [-one(T), one(T)]                       # initial nodes
-    fS = f.(S)
+    fS = f isa BatchFunction ? f.f(S, f.p) : f.(S)
     besterr, bestm = Inf, NaN
     while true                                  # main loop
         m = length(S)
         push!(nodes, copy(S))
         X = refine(S, max(refinement, ceil(16-m)))    # test points
-        fX = f.(X)
+        fX = f isa BatchFunction ? f.f(X, f.p) : f.(X)
         push!(vals, copy(fS))
         C = [ 1/(x-s) for x in X, s in S ]
         L = [a-b for a in fX, b in fS] .* C
